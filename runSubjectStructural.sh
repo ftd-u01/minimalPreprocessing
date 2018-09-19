@@ -40,7 +40,7 @@ if [[ ! -d $logDir ]]; then
   mkdir $logDir
 fi
 
-qsub -S /bin/bash -cwd -j y -o "${logDir}/${subject}_StructuralPreProc_\$JOB_ID.stdout" -pe unihost $slots -binding linear:$slots -l h_vmem=16.5G,s_vmem=16G ${scriptDir}/procStructural.sh $subject $dataType
+qsub -S /bin/bash -wd ${logDir} -j y -o "${logDir}/${subject}_StructuralPreProc_\$JOB_ID.stdout" -pe unihost $slots -binding linear:$slots -l h_vmem=16.5G,s_vmem=16G ${scriptDir}/procStructural.sh $subject $dataType
 
 sleep 0.1
 
