@@ -127,24 +127,27 @@ PRINTCOM=""
 for Subject in $Subjlist ; do
   echo $Subject
   
+  # Note we use the pre-scan normalized images here, because the original images have intensity truncation
+  # in the occipital area.
+
   #Input Images
   #Detect Number of T1w Images
-  numT1ws=`ls ${StudyFolder}/${Subject}/unprocessed/3T | grep -P "T1w_MPR[0-9]$" | wc -l`
+  numT1ws=`ls ${StudyFolder}/${Subject}/unprocessed/3T | grep -P "T1w_MPR[0-9]_Norm$" | wc -l`
   echo "Found ${numT1ws} T1w Images for subject ${Subject}"
   T1wInputImages=""
   i=1
   while [ $i -le $numT1ws ] ; do
-    T1wInputImages=`echo "${T1wInputImages}${StudyFolder}/${Subject}/unprocessed/3T/T1w_MPR${i}/${Subject}_3T_T1w_MPR${i}.nii.gz@"`
+    T1wInputImages=`echo "${T1wInputImages}${StudyFolder}/${Subject}/unprocessed/3T/T1w_MPR${i}_Norm/${Subject}_3T_T1w_MPR${i}_Norm.nii.gz@"`
     i=$(($i+1))
   done
   
   #Detect Number of T2w Images
-  numT2ws=`ls ${StudyFolder}/${Subject}/unprocessed/3T | grep -P "T2w_SPC[0-9]$" | wc -l`
+  numT2ws=`ls ${StudyFolder}/${Subject}/unprocessed/3T | grep -P "T2w_SPC[0-9]_Norm$" | wc -l`
   echo "Found ${numT2ws} T2w Images for subject ${Subject}"
   T2wInputImages=""
   i=1
   while [ $i -le $numT2ws ] ; do
-    T2wInputImages=`echo "${T2wInputImages}${StudyFolder}/${Subject}/unprocessed/3T/T2w_SPC${i}/${Subject}_3T_T2w_SPC${i}.nii.gz@"`
+    T2wInputImages=`echo "${T2wInputImages}${StudyFolder}/${Subject}/unprocessed/3T/T2w_SPC${i}_Norm/${Subject}_3T_T2w_SPC${i}_Norm.nii.gz@"`
     i=$(($i+1))
   done
 
@@ -176,8 +179,8 @@ for Subject in $Subjlist ; do
 
   #Using Spin Echo Field Maps (same as for fMRIVolume pipeline)
 
-  SpinEchoPhaseEncodeNegative="${StudyFolder}/${Subject}/unprocessed/3T/T1w_MPR1/${Subject}_3T_SpinEchoFieldMap_AP.nii.gz" #For the spin echo field map volume with a negative phase encoding direction (LR in HCP data, AP in 7T HCP data), set to NONE if using regular FIELDMAP
-  SpinEchoPhaseEncodePositive="${StudyFolder}/${Subject}/unprocessed/3T/T1w_MPR1/${Subject}_3T_SpinEchoFieldMap_PA.nii.gz" #For the spin echo field map volume with a positive phase encoding direction (RL in HCP data, PA in 7T HCP data), set to NONE if using regular FIELDMAP
+  SpinEchoPhaseEncodeNegative="${StudyFolder}/${Subject}/unprocessed/3T/T1w_MPR1_Norm/${Subject}_3T_SpinEchoFieldMap_AP.nii.gz" #For the spin echo field map volume with a negative phase encoding direction (LR in HCP data, AP in 7T HCP data), set to NONE if using regular FIELDMAP
+  SpinEchoPhaseEncodePositive="${StudyFolder}/${Subject}/unprocessed/3T/T1w_MPR1_Norm/${Subject}_3T_SpinEchoFieldMap_PA.nii.gz" #For the spin echo field map volume with a positive phase encoding direction (RL in HCP data, PA in 7T HCP data), set to NONE if using regular FIELDMAP
 #  DwellTime="0.000580002668012" #Echo Spacing or Dwelltime of spin echo EPI MRI image, set to NONE if not used. Dwelltime = 1/(BandwidthPerPixelPhaseEncode * # of phase encoding samples): DICOM field (0019,1028) = BandwidthPerPixelPhaseEncode, DICOM field (0051,100b) AcquisitionMatrixText first value (# of phase encoding samples).  On Siemens, iPAT/GRAPPA factors have already been accounted for.  
   
   # No dicom group 0019 in our Prisma data
