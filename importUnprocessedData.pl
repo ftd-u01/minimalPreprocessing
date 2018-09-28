@@ -370,7 +370,7 @@ sub linkDiffusionData {
 
     my $destDir = "${outputBaseDir}/Diffusion";
 
-    mkpath($destDir, {verbose => 0, mode => 0755}) or die "Cannot create output directory $destDir\n\t";
+    mkpath($destDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $destDir\n\t";
     
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\n";
 
