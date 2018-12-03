@@ -7,8 +7,6 @@ fi
 
 subject=$1
 
-binDir=`dirname $0`
-
 baseDir=/data/grossman/hcp/
 
 outDir=${baseDir}/DTI/${subject}
@@ -43,18 +41,23 @@ ${caminoPath}/fsl2scheme -bvals ${dwiInputDir}/bvals -bvecs ${dwiInputDir}/bvecs
 ${caminoPath}/selectshells -inputfile ${dwiInputDir}/data.nii.gz -schemefile $scheme -maxbval 1800 -outputroot ${outDir}/data_b1500_shell 
 ${caminoPath}/scheme2fsl -inputfile ${outDir}/data_b1500_shell.scheme -bscale 1 -outputroot ${outDir}/data_b1500_shell
 
-export HCPPIPEDIR=${baseDir}/scripts/Pipelines-3.4.0
+# export HCPPIPEDIR=${baseDir}/scripts/Pipelines-3.4.0
+# source ${baseDir}/scripts/Pipelines-3.4.0/Examples/Scripts/SetUpHCPPipeline.sh
 
-source ${baseDir}/scripts/Pipelines-3.4.0/Examples/Scripts/SetUpHCPPipeline.sh
+# Use FSL 5.0.9-eddy-patch to incorporate gradient nonlinearity in tensor computation
+export FSLDIR=/share/apps/fsl/5.0.9-eddy-patch
+
+source ${FSLDIR}/etc/fslconf/fsl.sh
 
 echo "
 --- `date`   DTI fit ---"
 
-dtifit --data=${outDir}/data_b1500_shell.nii.gz \
+${FSLDIR}/bin/dtifit --data=${outDir}/data_b1500_shell.nii.gz \
   --out=${outDir}/${subject} \
   --mask=${dwiInputDir}/nodif_brain_mask.nii.gz \
   --bvecs=${outDir}/data_b1500_shell.bvecs \
   --bvals=${outDir}/data_b1500_shell.bvals \
+  --gradnonlin=${dwiInputDir}/grad_dev.nii.gz \
   --wls --save_tensor
 
 # Warp labels to DTI space
@@ -74,4 +77,4 @@ done
 echo "
 --- `date`   Warping scalars to MNI ---"
 
-${binDir}/warpDTIToMNI.sh ${subject}
+${baseDir}/scripts/warpDTIToMNI.sh ${subject}

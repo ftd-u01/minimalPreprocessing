@@ -31,7 +31,12 @@ subjMNIDir=${baseDir}/subjectsPreProc/${subject}/MNINonLinear
 
 export HCPPIPEDIR=${baseDir}/scripts/Pipelines-3.4.0
 
+# Use pipeline version of FSL
 source ${baseDir}/scripts/Pipelines-3.4.0/Examples/Scripts/SetUpHCPPipeline.sh
+
+# Add c3d
+export PATH="/share/apps/c3d/c3d-1.1.0-Nightly-2016-02-26/bin/c3d:$PATH"
+
 
 echo "
 --- `date` Warping DTI scalars ---"
