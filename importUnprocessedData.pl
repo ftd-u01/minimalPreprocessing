@@ -406,7 +406,7 @@ sub linkRFMRIData {
 
     my $destDir = "${outputBaseDir}/rfMRI_REST${runNumber}_${polarity}";
 
-    mkpath($destDir, {verbose => 0, mode => 0755}) or die "Cannot create output directory $destDir\n\t";
+    mkpath($destDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $destDir\n\t";
     
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\n";
 
@@ -454,7 +454,7 @@ sub linkStructuralData {
 
     my $destDir = "${outputBaseDir}/${outputStructuralName}";
 
-    mkpath($destDir, {verbose => 0, mode => 0755}) or die "Cannot create output directory $destDir\n\t";
+    mkpath($destDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $destDir\n\t";
 
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\n";
 
@@ -495,7 +495,7 @@ sub linkTFMRIData {
 
     my $destDir = "${outputBaseDir}/${taskName}_${polarity}";
 
-    mkpath($destDir, {verbose => 0, mode => 0755}) or die "Cannot create output directory $destDir\n\t";
+    mkpath($destDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $destDir\n\t";
     
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\t";
 
@@ -531,7 +531,7 @@ sub linkPCASLData {
 
     my $destDir = "${outputBaseDir}/SPIRAL_V20_HCP_ASL";
 
-    mkpath($destDir, {verbose => 0, mode => 0755}) or die "Cannot create output directory $destDir\n\t";
+    mkpath($destDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $destDir\n\t";
     
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\n";
 
