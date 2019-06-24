@@ -312,49 +312,51 @@ if ( ($exitCode > 0) && ($forceOutput == 0) ) {
 
 my $outputBaseDir = "${inputBaseDir}/${subject}/unprocessed/3T";
 
-mkpath($outputBaseDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $outputBaseDir\n\t";
+if (! -d $outputBaseDir) {
+    mkpath($outputBaseDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $outputBaseDir\n\t";
+}
 
-linkStructuralData($inputNiiDir, $subject, $outputBaseDir, "T1w_MPR", 1, 0, ($t1[0], @fieldMaps[0..1]));
-linkStructuralData($inputNiiDir, $subject, $outputBaseDir, "T2w_SPC", 1, 0, ($t2[0], @fieldMaps[0..1]));
+$exitCode = linkStructuralData($inputNiiDir, $subject, $outputBaseDir, "T1w_MPR", 1, 0, ($t1[0], @fieldMaps[0..1]));
+$exitCode = linkStructuralData($inputNiiDir, $subject, $outputBaseDir, "T2w_SPC", 1, 0, ($t2[0], @fieldMaps[0..1]));
 
-linkStructuralData($inputNiiDir, $subject, $outputBaseDir, "T1w_MPR", 1, 1, ($t1[1], @fieldMaps[0..1]));
-linkStructuralData($inputNiiDir, $subject, $outputBaseDir, "T2w_SPC", 1, 1, ($t2[1], @fieldMaps[0..1]));
+$exitCode = linkStructuralData($inputNiiDir, $subject, $outputBaseDir, "T1w_MPR", 1, 1, ($t1[1], @fieldMaps[0..1]));
+$exitCode = linkStructuralData($inputNiiDir, $subject, $outputBaseDir, "T2w_SPC", 1, 1, ($t2[1], @fieldMaps[0..1]));
 
 
 if (scalar(@diffusion) > 0) {
-    linkDiffusionData($inputNiiDir, $subject, $outputBaseDir, @diffusion);
+    $exitCode = linkDiffusionData($inputNiiDir, $subject, $outputBaseDir, @diffusion);
 }
 
 
-if (scalar(@rfmri) > 0) {
-    linkRFMRIData($inputNiiDir, $subject, $outputBaseDir, 1, (@rfmri[0..1], @fieldMaps[0..1]));
+if (scalar(@rfmri) > 1) {
+    $exitCode = linkRFMRIData($inputNiiDir, $subject, $outputBaseDir, 1, (@rfmri[0..1], @fieldMaps[0..1]));
 }
-if (scalar(@rfmri) > 2) {
-    linkRFMRIData($inputNiiDir, $subject, $outputBaseDir, 1, (@rfmri[2..3], @fieldMaps[0..1]));
+if (scalar(@rfmri) > 3) {
+    $exitCode = linkRFMRIData($inputNiiDir, $subject, $outputBaseDir, 1, (@rfmri[2..3], @fieldMaps[0..1]));
 }
-if (scalar(@rfmri) > 4) {
-    linkRFMRIData($inputNiiDir, $subject, $outputBaseDir, 2, (@rfmri[4..5], @fieldMaps[2..3]));
+if (scalar(@rfmri) > 5) {
+    $exitCode = linkRFMRIData($inputNiiDir, $subject, $outputBaseDir, 2, (@rfmri[4..5], @fieldMaps[2..3]));
 }
-if (scalar(@rfmri) > 6) {
-    linkRFMRIData($inputNiiDir, $subject, $outputBaseDir, 2, (@rfmri[6..7], @fieldMaps[2..3]));
+if (scalar(@rfmri) > 7) {
+    $exitCode = linkRFMRIData($inputNiiDir, $subject, $outputBaseDir, 2, (@rfmri[6..7], @fieldMaps[2..3]));
 }
 
-if (scalar(@tfmriGambling) > 0) {
-    linkTFMRIData($inputNiiDir, $subject, $outputBaseDir, "tfMRI_GAMBLING", (@tfmriGambling[0..1], @fieldMaps[4..5]));
+if (scalar(@tfmriGambling) > 1) {
+    $exitCode = linkTFMRIData($inputNiiDir, $subject, $outputBaseDir, "tfMRI_GAMBLING", (@tfmriGambling[0..1], @fieldMaps[4..5]));
 }
-if (scalar(@tfmriGambling) > 2) {
-    linkTFMRIData($inputNiiDir, $subject, $outputBaseDir, "tfMRI_GAMBLING", (@tfmriGambling[2..3], @fieldMaps[4..5]));
+if (scalar(@tfmriGambling) > 3) {
+    $exitCode = linkTFMRIData($inputNiiDir, $subject, $outputBaseDir, "tfMRI_GAMBLING", (@tfmriGambling[2..3], @fieldMaps[4..5]));
 }
     
-if (scalar(@tfmriWM) > 0) {
-    linkTFMRIData($inputNiiDir, $subject, $outputBaseDir, "tfMRI_WM", (@tfmriWM[0..1], @fieldMaps[4..5]));
+if (scalar(@tfmriWM) > 1) {
+    $exitCode = linkTFMRIData($inputNiiDir, $subject, $outputBaseDir, "tfMRI_WM", (@tfmriWM[0..1], @fieldMaps[4..5]));
 }
-if (scalar(@tfmriWM) > 2) {
-    linkTFMRIData($inputNiiDir, $subject, $outputBaseDir, "tfMRI_WM", (@tfmriWM[2..3], @fieldMaps[4..5]));
+if (scalar(@tfmriWM) > 3) {
+    $exitCode = linkTFMRIData($inputNiiDir, $subject, $outputBaseDir, "tfMRI_WM", (@tfmriWM[2..3], @fieldMaps[4..5]));
 }
 
-if (scalar(@pcasl) > 0) {
-    linkPCASLData($inputNiiDir, $subject, $outputBaseDir, @pcasl);
+if (scalar(@pcasl) > 1) {
+    $exitCode = linkPCASLData($inputNiiDir, $subject, $outputBaseDir, @pcasl);
 }
 
 exit $exitCode;
@@ -370,7 +372,10 @@ sub linkDiffusionData {
 
     my $destDir = "${outputBaseDir}/Diffusion";
 
-    mkpath($destDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $destDir\n\t";
+    if ( ! mkpath($destDir, {verbose => 0, mode => 0775}) ) {
+      print "  Cannot create output directory $destDir\n";
+      return 1;
+    }
     
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\n";
 
@@ -387,6 +392,8 @@ sub linkDiffusionData {
     }
 
     chdir($cwd) or die "\n  Could not change directory to \n\n  " . rel2abs($cwd) . "\n\n";
+
+    return 0;
 }
 
 
@@ -406,7 +413,10 @@ sub linkRFMRIData {
 
     my $destDir = "${outputBaseDir}/rfMRI_REST${runNumber}_${polarity}";
 
-    mkpath($destDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $destDir\n\t";
+    if ( ! mkpath($destDir, {verbose => 0, mode => 0775}) ) {
+      print "  Cannot create output directory $destDir\n";
+      return 1;
+    }
     
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\n";
 
@@ -434,6 +444,8 @@ sub linkRFMRIData {
     }
 
     chdir($cwd) or die "\n  Could not change directory to \n\n  " . rel2abs($cwd) . "\n\n";
+
+    return 0;
 }
 
 
@@ -454,7 +466,10 @@ sub linkStructuralData {
 
     my $destDir = "${outputBaseDir}/${outputStructuralName}";
 
-    mkpath($destDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $destDir\n\t";
+    if ( ! mkpath($destDir, {verbose => 0, mode => 0775}) ) {
+      print "  Cannot create output directory $destDir\n";
+      return 1;
+    }
 
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\n";
 
@@ -476,6 +491,8 @@ sub linkStructuralData {
     }
 
     chdir($cwd) or die "\n  Could not change directory to \n\n  " . rel2abs($cwd) . "\n\n";
+
+    return 0;
 }
 
 
@@ -495,7 +512,10 @@ sub linkTFMRIData {
 
     my $destDir = "${outputBaseDir}/${taskName}_${polarity}";
 
-    mkpath($destDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $destDir\n\t";
+    if ( ! mkpath($destDir, {verbose => 0, mode => 0775}) ) {
+      print "  Cannot create output directory $destDir\n";
+      return 1;
+    }
     
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\t";
 
@@ -516,6 +536,8 @@ sub linkTFMRIData {
     }
 
     chdir($cwd) or die "\n  Could not change directory to \n\n  " . rel2abs($cwd) . "\n\n";
+
+    return 0;
 }
 
 
@@ -531,7 +553,10 @@ sub linkPCASLData {
 
     my $destDir = "${outputBaseDir}/SPIRAL_V20_HCP_ASL";
 
-    mkpath($destDir, {verbose => 0, mode => 0775}) or die "Cannot create output directory $destDir\n\t";
+    if ( ! mkpath($destDir, {verbose => 0, mode => 0775}) ) {
+      print "  Cannot create output directory $destDir\n";
+      return 1;
+    }
     
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\n";
 
@@ -548,6 +573,8 @@ sub linkPCASLData {
     }
 
     chdir($cwd) or die "\n  Could not change directory to \n\n  " . rel2abs($cwd) . "\n\n";
+
+    return 0;
 }
 
 
