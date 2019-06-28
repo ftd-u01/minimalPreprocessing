@@ -11,11 +11,6 @@ baseDir=/data/grossman/hcp/
 
 outDir=${baseDir}/DTI/${subject}
 
-if [[ -d $outputDir ]]; then
-  echo " Output exists for $subject "
-  exit 1
-fi
-
 antsPath=${baseDir}/bin/ants/
 caminoPath=${baseDir}/bin/camino/bin
 
