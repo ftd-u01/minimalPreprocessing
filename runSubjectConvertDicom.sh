@@ -18,6 +18,6 @@ logDir="${hcpBaseDir}/logs"
 
 slots=1
 
-qsub -b y -cwd -j y -o ${logDir}/${1}_convertDicom.stdout -pe unihost $slots -binding linear:$slots -l h_vmem=10.1G,s_vmem=10G ${scriptDir}/convertDicom.pl $1 
+qsub -b y -cwd -j y -o ${logDir}/${1}_convertDicom_'$JOB_ID'.stdout -pe unihost $slots -binding linear:$slots -l h_vmem=10.1G,s_vmem=10G ${scriptDir}/convertDicom.pl $1 
 sleep 0.1
 

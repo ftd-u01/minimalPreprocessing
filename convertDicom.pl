@@ -8,7 +8,7 @@ my $hcpBaseDir="/data/grossman/hcp";
 # Where subject directories live, with dicom data
 my $inputBaseDir = "${hcpBaseDir}/raw";
 
-my $outputDicomBaseDir = "${hcpBaseDir}/subjectsDICOM";
+my $dicomArchiveDir = "${hcpBaseDir}/subjectsDICOM";
 
 my $outputNiiBaseDir = "${hcpBaseDir}/subjectsPreProc";
 
@@ -59,24 +59,19 @@ my $tmpDir = "";
 my $tmpDirBaseName = "${subject}hcpDicomToNifti";
 
 if ( !($sysTmpDir && -d $sysTmpDir) ) {
+    # Default tmp dir
     $tmpDir = "/tmp/${tmpDirBaseName}";
 }
 else {
-    # Have system tmp dir
+    # Have TMPDIR
     $tmpDir = $sysTmpDir . "/${tmpDirBaseName}";
 }
 
 mkpath($tmpDir, {verbose => 0, mode => 0775}) or die "Cannot create working directory $tmpDir - maybe it exists from a previous run and needs to be deleted\n\t";
 
-my $subjectDicomDir = "${outputDicomBaseDir}/${subject}";
+my $subjectDicomDir = "${tmpDir}/${subject}";
 
-# Followup scans should have a different subjectID
-if (-d $subjectDicomDir) {
-  print "\n Subject DICOM dir $subjectDicomDir exists, skipping DICOM conversion \n";
-}
-else {
-  system("${binDir}/pipedream/dicom2series/dicom2series.sh ${subjectDicomDir} 1 0 ${inputBaseDir}/${subject}");
-}
+system("${binDir}/pipedream/dicom2series/dicom2series.sh ${subjectDicomDir} 1 0 ${inputBaseDir}/${subject}");
 
 my @tps = `ls ${subjectDicomDir}`;
 
@@ -92,7 +87,7 @@ foreach my $timePoint (@tps) {
     my $niiDir = "${outputSubjectBaseDir}/rawNii";
     
     if (-d ${niiDir}) {
-	print "\n  Subject output directory $outputSubjectBaseDir exists, skipping this time point \n";
+	print "\n  WARNING: subject output directory $outputSubjectBaseDir exists, skipping this time point \n";
         next;
     }
 
@@ -101,16 +96,37 @@ foreach my $timePoint (@tps) {
 
     system("ls ${subjectDicomDir}/${timePoint} | cut -d _ -f 2-100 | sort | uniq > $protocolList");
 
-    print "\n  Converting series matching these names:\n\n";
+    print "\nConverting series matching these names:\n\n";
 
     system("cat $protocolList");
 
     print "\n";
 
-    system("${binDir}/pipedream/dicom2nii/dicom2nii.sh ${outputDicomBaseDir} $subject $timePoint $protocolList $niiDir");
+    system("${binDir}/pipedream/dicom2nii/dicom2nii.sh ${tmpDir} $subject $timePoint $protocolList $niiDir");
 
     system("mkdir ${niiDir}/logs");
 
     system("mv $niiDir/*.txt ${niiDir}/logs");
+
+    # Make a tarball of the DICOM data for debugging / archive purposes
+
+    my $sessionArchive = "${dicomArchiveDir}/${subject}_${timePoint}.tgz";
+
+    if (-f $sessionArchive) {
+        print "WARNING: overwriting $sessionArchive \n";
+        system("rm -f $sessionArchive");
+    }
+
+    print "\nArchiving DICOM for $subject $timePoint\n";
+
+    system("tar -C ${tmpDir} -czf $sessionArchive ${subject}") == 0 or do {
+        if ($? == -1) {
+            print "\n  WARNING: Could not archive data for $subject $timePoint: failed to execute: $!\n";
+        }
+        else {
+            my $tarExit = $? >> 8;
+            print "\n  WARNING: Could not archive data for $subject $timePoint: process exited with code $tarExit\n";
+        }
+    }
 
 }

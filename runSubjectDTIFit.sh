@@ -24,7 +24,6 @@ slots=2
 subject=$1
 
 
-# Don't overwrite existing output
 structuralProcDir="${hcpBaseDir}/subjectsPreProc/${subject}/T1w"
 
 if [[ ! -f "${structuralProcDir}/Diffusion/data.nii.gz" ]]; then
