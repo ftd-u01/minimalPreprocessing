@@ -259,10 +259,10 @@ if (scalar(@rfmri) != $expectedNumRFMRIImages) {
 
 # Check we have the same number of AP and PA rfMRI data
 
-my $numFMRISBRefImagesAP = () = $rfmriString =~ m/AP_SBRef.nii.gz/;
-my $numFMRISBRefImagesPA = () =  $rfmriString =~ m/PA_SBRef.nii.gz/;
-my $numFMRIImagesAP = () = $rfmriString =~ m/AP.nii.gz/;
-my $numFMRIImagesPA = () = $rfmriString =~ m/PA.nii.gz/;
+my $numFMRISBRefImagesAP = () = $rfmriString =~ m/AP_SBRef.nii.gz/g;
+my $numFMRISBRefImagesPA = () =  $rfmriString =~ m/PA_SBRef.nii.gz/g;
+my $numFMRIImagesAP = () = $rfmriString =~ m/AP.nii.gz/g;
+my $numFMRIImagesPA = () = $rfmriString =~ m/PA.nii.gz/g;
 
 if (!( $numFMRISBRefImagesAP == $numFMRISBRefImagesPA && $numFMRISBRefImagesAP == $numFMRIImagesAP 
        && $numFMRIImagesAP == $numFMRIImagesPA )) {
@@ -381,6 +381,11 @@ sub linkDiffusionData {
 
     foreach my $file (@files) {
 
+        if (!($file && -f "${inputNiiDir}/${file}")) {
+            print "\n  WARNING: Missing diffusion data for\n\t${destDir}\n\n";
+            next;
+        }
+
 	my $outputFile = $file;
 
 	$outputFile =~ s/^${subjectID}_[0-9]{4}/${subjectID}_3T/;
@@ -421,6 +426,11 @@ sub linkRFMRIData {
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\n";
 
     foreach my $file (@files) {
+
+        if (!($file && -f "${inputNiiDir}/${file}")) {
+            print "\n  WARNING: Missing rfMRI data or field maps for\n\t${destDir}\n\n";
+            next;
+        }
 
 	my $outputFile = $file;
 
@@ -475,6 +485,11 @@ sub linkStructuralData {
 
     foreach my $file (@files) {
 
+        if (!($file && -f "${inputNiiDir}/${file}")) {
+            print "\n  WARNING: Missing structural data or field maps for\n\t${destDir}\n\n";
+            next;
+        }
+
         my $outputFile = $file;
 
         if ($file =~ m/SpinEchoFieldMap/) {
@@ -521,6 +536,11 @@ sub linkTFMRIData {
 
     foreach my $file (@files) {
 
+        if (!($file && -f "${inputNiiDir}/${file}")) {
+            print "\n  WARNING: Missing tfMRI data or field maps for\n\t${destDir}\n\n";
+            next;
+        }
+
 	my $outputFile = $file;
 	
 	if ( !($file =~ m/SpinEchoFieldMap/ || $file =~ m/_${polarity}(_SBRef)?\.nii\.gz/) ) {
@@ -561,6 +581,11 @@ sub linkPCASLData {
     chdir($destDir) or die "\n  Could not change directory to \n\n  " . rel2abs($destDir) . "\n\n";
 
     foreach my $file (@files) {
+
+        if (!($file && -f "${inputNiiDir}/${file}")) {
+            print "\n  WARNING: Missing ASL data for\n\t${destDir}\n\n";
+            next;
+        }
 
 	my $outputFile = $file;
 

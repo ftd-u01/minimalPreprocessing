@@ -139,7 +139,7 @@ for Subject in $Subjlist ; do
 
   # List all names of fMRI series dirs, will search for these and process them if found.
   # Will search for _AP and _PA so don't add those separately
-  fMRISeriesTypes="rfMRI_REST1 rfMRI_REST2 tfMRI_GAMBLING tfMRI_WM"
+  fMRISeriesTypes="rfMRI_REST1 rfMRI_REST2" # add these to do task also: tfMRI_GAMBLING tfMRI_WM
   
   for seriesID in $fMRISeriesTypes; do
     if [[ -d "${StudyFolder}/${Subject}/unprocessed/3T/${seriesID}_PA" ]]; then
