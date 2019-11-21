@@ -75,3 +75,5 @@ checkExit FreeSurferPipeline $?
 ${hcpPipelineScriptDir}/PostFreeSurferPipelineBatch.sh $studyArgs
 checkExit PostFreeSurferPipeline $?
 
+echo "Structural pre-processing completed at `date`" > ${hcpBaseDir}/subjectsPreProc/${subject}/T1w/StructuralPreProcessingCompleted.txt
+
