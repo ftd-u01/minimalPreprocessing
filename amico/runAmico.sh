@@ -34,6 +34,11 @@ amicoDataDir=/data/grossman/hcp/amico/HCP_Lifespan/${subject}
 
 echo "/share/apps/matlab/R2017a/bin/matlab -nodisplay -r run\(\'amicoModelFit.m\'\)
 gzip *.nii AMICO/NODDI/*.nii
+
+if [[ -f AMICO/NODDI/FIT_ICVF.nii.gz ]]; then
+  rm dwi.nii.gz brainMask.nii.gz bvals bvecs
+fi
+
 " > ${amicoDataDir}/amico_qscript.sh
 
 RAM=12G
